@@ -418,8 +418,6 @@ impl<C: Config> Client<C> {
             .eventsource()
             .unwrap();
 
-        dbg!("HERE");
-
         stream(event_source).await
     }
 
