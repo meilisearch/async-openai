@@ -185,3 +185,6 @@ pub use users::Users;
 pub use vector_store_file_batches::VectorStoreFileBatches;
 pub use vector_store_files::VectorStoreFiles;
 pub use vector_stores::VectorStores;
+
+// re-exports
+pub use reqwest_eventsource;
