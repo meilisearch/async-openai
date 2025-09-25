@@ -1,4 +1,4 @@
-use std::pin::Pin;
+use std::{pin::Pin, time::Duration};
 
 use futures::Stream;
 use serde::Deserialize;
@@ -108,6 +108,14 @@ pub enum AssistantStreamEvent {
     /// Occurs when a stream ends.
     #[serde(rename = "done")]
     Done(String),
+    /// Unknown event type.
+    #[serde(rename = "unknown")]
+    Unknown {
+        event: String,
+        data: String,
+        id: String,
+        retry: Option<Duration>,
+    },
 }
 
 pub type AssistantEventStream =
@@ -115,6 +123,7 @@ pub type AssistantEventStream =
 
 impl TryFrom<eventsource_stream::Event> for AssistantStreamEvent {
     type Error = OpenAIError;
+
     fn try_from(value: eventsource_stream::Event) -> Result<Self, Self::Error> {
         match value.event.as_str() {
             "thread.created" => serde_json::from_str::<ThreadObject>(value.data.as_str())
@@ -206,10 +215,20 @@ impl TryFrom<eventsource_stream::Event> for AssistantStreamEvent {
                 .map_err(|e| map_deserialization_error(e, value.data.as_bytes()))
                 .map(AssistantStreamEvent::ErrorEvent),
             "done" => Ok(AssistantStreamEvent::Done(value.data)),
-
-            _ => Err(OpenAIError::StreamError(
-                "Unrecognized event: {value:?#}".into(),
-            )),
+            _ => {
+                let eventsource_stream::Event {
+                    id,
+                    event,
+                    data,
+                    retry,
+                } = value;
+                Ok(AssistantStreamEvent::Unknown {
+                    event,
+                    data,
+                    id,
+                    retry,
+                })
+            }
         }
     }
 }
