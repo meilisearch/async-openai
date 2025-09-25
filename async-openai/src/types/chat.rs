@@ -566,6 +566,7 @@ pub enum ServiceTier {
 pub enum ServiceTierResponse {
     Scale,
     Default,
+    Auto, // AWS bedrock answer `auto` here
 }
 
 #[derive(Clone, Serialize, Debug, Deserialize, PartialEq)]
