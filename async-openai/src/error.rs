@@ -20,7 +20,7 @@ pub enum OpenAIError {
     FileReadError(String),
     /// Error on SSE streaming
     #[error("stream failed: {0}")]
-    StreamError(String),
+    StreamError(reqwest_eventsource::Error),
     /// Error from client side validation
     /// or when builder fails to build request before making API call
     #[error("invalid args: {0}")]

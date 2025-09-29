@@ -341,7 +341,12 @@ impl<C: Config> Client<C> {
                 let message: String = String::from_utf8_lossy(&bytes).into_owned();
                 tracing::warn!("Server error: {status} - {message}");
                 return Err(backoff::Error::Transient {
-                    err: OpenAIError::ApiError(ApiError { message, r#type: None, param: None, code: None }),
+                    err: OpenAIError::ApiError(ApiError {
+                        message,
+                        r#type: None,
+                        param: None,
+                        code: None,
+                    }),
                     retry_after: None,
                 });
             }
@@ -475,7 +480,7 @@ where
         while let Some(ev) = event_source.next().await {
             match ev {
                 Err(e) => {
-                    if let Err(_e) = tx.send(Err(OpenAIError::StreamError(e.to_string()))) {
+                    if let Err(_e) = tx.send(Err(OpenAIError::StreamError(e))) {
                         // rx dropped
                         break;
                     }
@@ -520,7 +525,7 @@ where
         while let Some(ev) = event_source.next().await {
             match ev {
                 Err(e) => {
-                    if let Err(_e) = tx.send(Err(OpenAIError::StreamError(e.to_string()))) {
+                    if let Err(_e) = tx.send(Err(OpenAIError::StreamError(e))) {
                         // rx dropped
                         break;
                     }
