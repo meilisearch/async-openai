@@ -393,6 +393,7 @@ pub struct ChatCompletionMessageToolCall {
     /// The ID of the tool call.
     pub id: String,
     /// The type of the tool. Currently, only `function` is supported.
+    #[serde(default)]
     pub r#type: Option<ChatCompletionToolType>,
     /// The function that the model called.
     pub function: FunctionCall,
